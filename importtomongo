@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+mongoimport --port $BOXEN_MONGODB_PORT -db osm -c udacity --file data/raw-data.osm.json

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+curl -o data/raw-data.osm 'http://overpass-api.de/api/map?bbox=-49.4385,-27.8488,-48.3508,-26.8094'

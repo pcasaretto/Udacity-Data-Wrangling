@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from pymongo import MongoClient
@@ -65,5 +66,3 @@ pprint.pprint(dict(st_types))
     #             assert better_name == "West Lexington Street"
     #         if name == "Baldwin Rd.":
     #             assert better_name == "Baldwin Road"
-
-

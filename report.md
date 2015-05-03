@@ -47,6 +47,49 @@ stopover)
 
 ## Data overview
 
+### File sizes
+
+* data/raw-data.osm 76 MB
+* data/raw-data.osm.json 84 MB
+
+### Characteristics
+
+#### Number of documents
+`db.udacity.find().count()`
+384064
+
+#### Number of nodes
+`db.udacity.find({"type":"node"}).count()`
+349776
+
+#### Number of ways
+`db.udacity.find({"type":"way"}).count()`
+34268
+
+# Number of unique users
+`db.udacity.distinct({"created.user"}).length`
+410
+
+# Top 3 contributing users
+
+```javascript
+db.udacity.aggregate([{"$group":{"_id":"$created.user", "count":{"$sum":1}}}, {"$sort":{"count": -1 }}, {"$limit":3}])
+{ "_id" : "Prblanco", "count" : 83015 }
+{ "_id" : "Rachmaninoff", "count" : 57591 }
+{ "_id" : "DrSeuthberg", "count" : 31098 }
+```
+# Number of users appearing only once (having 1 post)
+
+```javascript
+db.udacity.aggregate([
+  {"$group":{"_id":"$created.user", "count":{"$sum":1}}},
+  {"$group":{"_id":"$count", "num_users":{"$sum":1}}},
+  {"$sort":{"_id":1}},
+  {"$limit":1}
+])
+{ "_id" : 1, "num_users" : 65 }
+```
+
 # Auditing
 
 After getting a feeling for the data looking at the raw osm data, I used an
@@ -57,7 +100,7 @@ the data.
 
 Using a modified version of the script developed on https://www.udacity.com/course/viewer#!/c-ud032-nd/l-768058569/e-865319708/m-900198650 I investigated problems with street names.
 
-# Problems found
+### Problems found
 
 At first I included only a few street "types" and got this as output.
 
@@ -190,9 +233,9 @@ The file `audit/postal-codes` outputs 4 values.
 * Number of properly formated postal-codes (e.g. 88338-220)
 * Number of records with the most common alternate form (e.g 88338220)
 * Number of records that do not fit either of the alternatives
-* Number of records thatt do not start with 88 or 89 (expected for the given area)
+* Number of records that do not start with 88 or 89 (expected for the given area)
 
-# Problems found
+### Problems found
 
 As expected there were some (52) records with the alternative form. I decided to
 change all of them to the proper format using `fix/postal-codes`.
@@ -200,14 +243,89 @@ change all of them to the proper format using `fix/postal-codes`.
 There were no records that did not fit either formats and only one that did not
 start with the expected prefix. This record was fixed manually.
 
+## Other problems
 
+I noticed there were some nodes that had information about speed cameras but
+the data that held the max speed for the camera was saved as a string.
+I used the following snippet to fix this.
 
-`db.udacity.find({"$and": [{"address.postcode": {"$exists": true}}, {"address.postcode":{"$not": /\d\d\d\d\d\-\d\d\d/ }}]})`
+```javascript
+db.udacity.find({"highway":"speed_camera"}).forEach(function(doc) {
+    doc.maxspeed = new NumberInt(doc.maxspeed);
+    db.udacity.save(doc);
+});
+```
 
+# Improvement Ideas
 
+The dataset has one major problem. There just isn't enough data.
+The number of documents is very low for such a big area that includes the
+capital for the state.
 
-88063-000
+Despite the efforts of some hard working users, the mapping community for the
+area is still very weak and much of the cities (specially outside the capital)
+have nothing but road information.
 
-# Other ideas
+One interesting project to fix this situation would be to study how the mapping
+communities evolved in the areas that have well developed maps and apply the
+same techniques for the chosen area.
+
+Because there is not much data at all, there also isn't much baf data so there
+is an opportunity to define standards and avoid the pollution that comes with
+natural growth.
+
+## Additional data exploration using MongoDB queries
+
+### Top 10 appearing amenities
+
+```javascript
+db.udacity.aggregate([
+  {"$match":{"amenity":{"$exists":1}}},
+  {"$group":{"_id":"$amenity", "count":{"$sum":1}}},
+  {"$sort":{"count": -1}},
+  {"$limit":10}
+])
+```
+
+### Biggest religion
+
+```javascript
+db.udacity.aggregate([
+  {"$match":{"amenity":{"$exists":1}, "amenity":"place_of_worship"}},
+  {"$group":{"_id":"$religion", "count":{"$sum":1}}},
+  {"$sort":{"count": -­1}},
+  {"$limit":1}
+])
+[ {"_id":"christian","count":155} ]
+```
+
+### Most popular cuisines
+
+```javascript
+db.udacity.aggregate([
+  {"$match":{"amenity":{"$exists":1}, "amenity":"restaurant"}},
+  {"$group":{"_id":"$cuisine", "count":{"$sum":1}}},
+  {"$sort":{"count":-1}},
+  {"$limit":3}
+])
+{ "_id" : null, "count" : 166 }
+{ "_id" : "pizza", "count" : 36 }
+{ "_id" : "seafood", "count" : 25 }
+```
+
+Here we can see the information for restaurants is very poor.
+
+### Average maxspeed for speed cameras
+
+```javascript
+db.udacity.aggregate([
+  {"$match":{"highway":"speed_camera"}},
+  {"$group":{"_id":null, "average_maxspeed":{"$avg": "$maxspeed"}}},
+])
+{ "_id" : null, "average_maxspeed" : 54 }
+```
 
 # Conclusion
+
+In spite of the deficiencies pointed earlier, the dataset was successfully
+cleaned and could be used as a standard for future contributors.

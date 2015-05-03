@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd $(dirname $0)
+
+mongo osm --port $BOXEN_MONGODB_PORT postal-codes.js

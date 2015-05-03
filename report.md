@@ -57,6 +57,8 @@ the data.
 
 Using a modified version of the script developed on https://www.udacity.com/course/viewer#!/c-ud032-nd/l-768058569/e-865319708/m-900198650 I investigated problems with street names.
 
+# Problems found
+
 At first I included only a few street "types" and got this as output.
 
 ```
@@ -182,8 +184,29 @@ The final code for the audit and fix can be found at (respectively):
 ## Postal codes
 
 The second step was to analyze postcodes.
+I decided this time to not use python and use mongo shell client directly.
+The file `audit/postal-codes` outputs 4 values.
+
+* Number of properly formated postal-codes (e.g. 88338-220)
+* Number of records with the most common alternate form (e.g 88338220)
+* Number of records that do not fit either of the alternatives
+* Number of records thatt do not start with 88 or 89 (expected for the given area)
+
+# Problems found
+
+As expected there were some (52) records with the alternative form. I decided to
+change all of them to the proper format using `fix/postal-codes`.
+
+There were no records that did not fit either formats and only one that did not
+start with the expected prefix. This record was fixed manually.
+
+
 
 `db.udacity.find({"$and": [{"address.postcode": {"$exists": true}}, {"address.postcode":{"$not": /\d\d\d\d\d\-\d\d\d/ }}]})`
+
+
+
+88063-000
 
 # Other ideas
 

@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+echo "Proper postcodes"
+mongo osm --port $BOXEN_MONGODB_PORT --quiet --eval 'db.udacity.find({"$and": [{"address.postcode": {"$exists": true}}, {"address.postcode": /\d\d\d\d\d\-\d\d\d/ }]}).count()'
+echo "Missing '-' postcodes"
+mongo osm --port $BOXEN_MONGODB_PORT --quiet --eval 'db.udacity.find({"$and": [{"address.postcode": {"$exists": true}}, {"address.postcode": /\d\d\d\d\d\d\d\d/ }]}).count()'
+echo "Unexpected postcodes"
+mongo osm --port $BOXEN_MONGODB_PORT --quiet --eval 'db.udacity.find({"$and": [{"address.postcode": {"$exists": true}}, {"address.postcode": {"$not": /\d\d\d\d\d\-\d\d\d/ } }, {"address.postcode": {"$not": /\d\d\d\d\d\d\d\d/ } } ] }).count()'
+echo "Out of place postcodes"
+mongo osm --port $BOXEN_MONGODB_PORT --quiet --eval 'db.udacity.find({"$and": [{"address.postcode": {"$exists": true}}, {"address.postcode": {"$not": /^8[89]/ } } ] }).count()'

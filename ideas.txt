@@ -1,0 +1,6 @@
+number of avg speed for traffic cameras
+
+  <node id="90200553" lat="-27.4483987" lon="-48.4340742" version="5" timestamp="2013-02-28T21:44:23Z" changeset="15202673" uid="506085" user="Koyaani">
+    <tag k="highway" v="speed_camera"/>
+    <tag k="maxspeed" v="50"/>
+  </node>

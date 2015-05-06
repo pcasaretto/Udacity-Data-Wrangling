@@ -1,5 +1,7 @@
 OpenStreetMap Sample Project
+
 Data Wrangling with MongoDB
+
 Paulo Luis Franchini Casaretto
 
 Map Area: Vale do Itajaí and Florianópolis Metropolitan Area, Santa Catarina, Brazil
@@ -171,7 +173,7 @@ At first I included only a few street "types" and got this as output.
                    u'Travessa da Liberdade',
                    u'Travessa dos Imigrantes']),
  u'Via': set([u'Via Expressa no Mercado BIG'])}
- ```
+```
 
  I fed the right types back into the script and ran it again.
 
@@ -270,9 +272,14 @@ One interesting project to fix this situation would be to study how the mapping
 communities evolved in the areas that have well developed maps and apply the
 same techniques for the chosen area.
 
-Because there is not much data at all, there also isn't much baf data so there
-is an opportunity to define standards and avoid the pollution that comes with
-natural growth.
+To achieve that goal, one could explore the
+[listing of territory based projects](http://wiki.openstreetmap.org/wiki/List_of_territory_based_projects)
+and get in touch with project leaders and learn from them what kind of
+activities would help jumpstart the local community.
+
+More specifically, the [Brazilian directory](http://wiki.openstreetmap.org/wiki/WikiProject_Brazil) might have
+useful info on how the current mapping effort is going and what would be the
+best way to help.
 
 ## Additional data exploration using MongoDB queries
 
